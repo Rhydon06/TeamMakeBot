@@ -1,0 +1,3 @@
+# TeamMakeBot
+
+discord上でランダムなチーム分けを行うことが出来るbotです。
