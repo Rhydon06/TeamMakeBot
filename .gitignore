@@ -1,9 +1,4 @@
 test_run.py
-src/__pycache__/__init__.cpython-38.pyc
-src/__pycache__/bot.cpython-38.pyc
 .vscode/launch.json
-src/team_maker/__pycache__/team_maker.cpython-38.pyc
 コマンド.txt
-src/team_maker/__pycache__/__init__.cpython-38.pyc
-src/team_maker/__pycache__/member.cpython-38.pyc
 .gitignore

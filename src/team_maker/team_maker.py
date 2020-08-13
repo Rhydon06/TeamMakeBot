@@ -3,7 +3,7 @@ from .member import Member
 
 class TeamMaker():
     """
-    チーム作成クラス
+    チームメーカー
     """
     def __init__(self) -> None:
         # チーム作成時に使うメンバー
