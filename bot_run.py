@@ -9,5 +9,5 @@ if __name__ == "__main__":
     token = config["BOT"]["Token"]
     prefix = config["BOT"]["CommandPrefix"]
 
-    bot = bot.TeamMakeBot()
+    bot = bot.TeamMakeBot(prefix)
     bot.run(token)
