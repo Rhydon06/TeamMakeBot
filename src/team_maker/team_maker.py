@@ -19,7 +19,6 @@ class TeamMaker():
         # 1チームの最大人数
         self.team_size = 5
 
-    
     def add_member(self, name: str) -> None:
         """
         チームメーカーにメンバーを追加する
@@ -33,7 +32,6 @@ class TeamMaker():
         # メンバーを追加
         self.members.append(Member(name))
     
-
     def delete_member(self, name: str) -> None:
         """
         指定した名前のメンバーを削除する
@@ -49,6 +47,11 @@ class TeamMaker():
             # 指定した名前が見つからなければValueErrorを発生させる
             raise ValueError("指定した名前のメンバーは追加されていません。")
     
+    def clear_member(self) -> None:
+        """
+        全てのメンバーを削除
+        """
+        self.members.clear()
 
     def make_team(self) -> None:
         """
