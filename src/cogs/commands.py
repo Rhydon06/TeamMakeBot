@@ -1,10 +1,8 @@
-from discord import Embed
-from discord import embeds
 from discord.ext import commands
 from ..embed_builder import Embed_Builder
 
 class CommandsCog(commands.Cog):
-    """
+    """ｆ
     基本的なコマンド
     """
     def __init__(self, bot) -> None:
@@ -29,9 +27,6 @@ class CommandsCog(commands.Cog):
                 added_members.append(name)
             except ValueError:
                 pass
-        
-        print(added_members)
-        print(names)
         
         # 一人も追加しなかった場合その旨を出力して終了
         if len(added_members) == 0:
@@ -106,6 +101,86 @@ class CommandsCog(commands.Cog):
         if len(self.tm.members) < self.tm.team_num:
             await ctx.send("メンバーが少なすぎます")
             return
+        
+        # チーム分け
+        self.tm.make_team()
+
+        # Discordに表示される埋め込みオブジェクトの作成と送信
+        eb = Embed_Builder("チーム分け")
+        # チームに分けられたメンバー
+        for i, team in enumerate(self.tm.teams):
+            eb.add_values(f"チーム{i+1}", team)
+        # 余りのメンバー
+        if len(self.tm.remainder) > 0:
+            eb.add_values("余り", self.tm.remainder, inline=False)
+        await ctx.send(embed=eb.embed)
+
+    @commands.command()
+    async def addvc(self, ctx) -> None:
+        """
+        コマンド送信者と同じボイスチャンネルに接続している人をBotに追加して、結果を表示する
+        """
+        # 送信者が接続しているボイスチャンネル
+        voice = ctx.author.voice
+
+        # ボイスチャンネルに接続中でない場合、その旨を送信し終了
+        if not voice:
+            await ctx.send("ボイスチャンネルに入って実行してください")
+            return
+
+        # ボイスチャンネルに接続中のメンバーの表示名
+        names = [member.display_name for member in voice.channel.members]
+
+        # メンバーの追加を試み、追加したメンバーとしていないメンバーに分ける
+        added_members = []
+        for name in names:
+            try:
+                self.tm.add_member(name)
+                added_members.append(name)
+            except ValueError:
+                pass
+        
+        # 一人も追加しなかった場合その旨を出力して終了
+        if len(added_members) == 0:
+            await ctx.send("追加したメンバーはありません")
+            return
+
+        # Discordに表示される埋め込みオブジェクトの作成と送信
+        eb = Embed_Builder("追加")
+        eb.add_values("追加したメンバー", added_members)
+        await ctx.send(embed=eb.embed)
+
+    @commands.command()
+    async def makevc(self, ctx) -> None:
+        """
+        チームメーカーのメンバーを全て削除した後、
+        コマンド送信者と同じボイスチャンネルに接続している人をBotに追加して、チーム分けをし、結果を表示する
+        """
+        # 送信者が接続しているボイスチャンネル
+        voice = ctx.author.voice
+
+        # ボイスチャンネルに接続中でない場合、その旨を送信し終了
+        if not voice:
+            await ctx.send("ボイスチャンネルに入って実行してください")
+            return
+        
+        # ボイスチャンネルに接続中のメンバーの表示名
+        names = [member.display_name for member in voice.channel.members]
+
+        # メンバーがチーム数より少ない場合その旨を出力して終了
+        if len(names) < self.tm.team_num:
+            await ctx.send("メンバーが少なすぎます")
+            return
+
+        # メンバーを空にする
+        self.tm.clear_member()
+
+        # メンバーの追加
+        for name in names:
+            try:
+                self.tm.add_member(name)
+            except ValueError:
+                pass
         
         # チーム分け
         self.tm.make_team()
