@@ -1,3 +1,4 @@
+from discord import Intents
 from discord.ext import commands
 from .team_maker.team_maker import TeamMaker
 
@@ -19,7 +20,7 @@ class TeamMakeBot(commands.Bot):
         print("bot起動中…")
         
         # discordに入力するコマンドの接頭語を設定
-        super().__init__(command_prefix)
+        super().__init__(command_prefix=command_prefix, intents=Intents.all())
 
         # チームメーカー
         self.tm = TeamMaker()

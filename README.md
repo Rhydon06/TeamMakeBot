@@ -7,7 +7,8 @@ Discord上でランダムなチーム分けを行うことが出来るBotです�
 1. 最新のPython3をインストール([python.org](https://www.python.org/))
 2. discord.pyをインストール([詳しい説明](https://discordpy.readthedocs.io/ja/latest/intro.html))
 3. DiscordのBotアカウントを作成し、Botを使いたいサーバーに招待([詳しい説明](https://discordpy.readthedocs.io/ja/latest/discord.html))
-4. **settings.ini**の**Token**の値に、作成したBotアカウントのトークンを設定
+4. [Discord開発者ポータル](https://discord.com/developers/applications)->Applications->設定するBot->Botタブの順に移動して、Privileged Gateway Intentsの直下のボタンを2つオンにする([詳しい説明](https://qiita.com/disneyresidents/items/72741a88265107dd04d3))
+5. **settings.ini**の**Token**の値に、作成したBotアカウントのトークンを設定
 
 
 # 起動方法
