@@ -1,7 +1,7 @@
 # TeamMakeBot
 Discord上でランダムなチーム分けを行うことが出来るBotです。   
 バグがあったら教えてください。
-
+![TeamMakeBot-ScreenShot](https://user-images.githubusercontent.com/38654009/98086125-a1fa7800-1ec1-11eb-88c2-8e64c8dabe77.png)
 
 # 環境設定
 1. 最新のPython3をインストール([python.org](https://www.python.org/))
