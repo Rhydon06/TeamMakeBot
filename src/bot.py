@@ -8,7 +8,8 @@ COGS_FOLDER = "src.cogs"
 # コグ
 COGS = [
     "commands",
-    "test_cog"
+    "settings",
+    "hello"
 ]
 
 class TeamMakeBot(commands.Bot):
