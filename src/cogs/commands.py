@@ -13,7 +13,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def add(self, ctx, *names: str) -> None:
         """
-        Botに名前を追加して、結果を表示する
+        Botにメンバーを追加する
         """
         # 名前が入力されていない場合その旨を出力する
         if len(names) == 0:
@@ -42,7 +42,7 @@ class Commands(commands.Cog):
     @commands.command(name="join")
     async def _join(self, ctx) -> None:
         """
-        Botに送信者の名前を追加して、結果を表示する
+        Botに送信者を追加する
         """
         
         name = ctx.author.display_name
@@ -58,7 +58,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def delete(self, ctx, *names: str) -> None:
         """
-        Botに名前を追加して結果を表示する
+        Botから指定したメンバーを削除する
         """
         # 名前が入力されていない場合その旨を出力して終了
         if len(names) == 0:
@@ -87,7 +87,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def leave(self, ctx) -> None:
         """
-        Botから送信者の名前を削除して、結果を表示する
+        Botから送信者を削除する
         """
         
         name = ctx.author.display_name
@@ -103,7 +103,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def clear(self, ctx) -> None:
         """
-        チームメーカーにのメンバーを全て削除する
+        Botに追加されているメンバーを全て削除する
         """
         self.tm.clear_member()
         await ctx.send("全てのメンバーを削除しました")
@@ -111,7 +111,7 @@ class Commands(commands.Cog):
     @commands.command(name="list")
     async def _list(self, ctx) -> None:
         """
-        チームメーカーに追加済みのメンバーを表示する
+        Botに追加済みのメンバーを表示する
         """
         members = self.tm.members
         
@@ -128,7 +128,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def make(self, ctx) -> None:
         """
-        チーム分けをして表示する
+        チーム分けをする
         """
         # メンバーがチーム数より少ない場合その旨を出力して終了
         if len(self.tm.members) < self.tm.team_num:
@@ -151,7 +151,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def addvc(self, ctx) -> None:
         """
-        コマンド送信者と同じボイスチャンネルに接続している人をBotに追加して、結果を表示する
+        送信者と同じボイスチャンネルに接続している人をBotに追加する
         """
         # 送信者が接続しているボイスチャンネル
         voice = ctx.author.voice
@@ -186,8 +186,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def makevc(self, ctx) -> None:
         """
-        チームメーカーのメンバーを全て削除した後、
-        コマンド送信者と同じボイスチャンネルに接続している人をBotに追加して、チーム分けをし、結果を表示する
+        Botのメンバーを全て削除し、送信者と同じボイスチャンネルに接続している人をBotに追加し、チーム分けをする
         """
         # 送信者が接続しているボイスチャンネル
         voice = ctx.author.voice
