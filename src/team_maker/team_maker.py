@@ -1,3 +1,4 @@
+from typing import Dict, List, Tuple
 import random
 from .member import Member
 
@@ -7,17 +8,17 @@ class TeamMaker():
     """
     def __init__(self) -> None:
         # チーム作成時に使うメンバー
-        self.members = []
+        self.members: List[Member] = []
         
         # 完成済みチーム
-        self.teams = []
+        self.teams: List[List[Member]] = []
         # チーム分け時に余ったメンバー
-        self.remainder = []
+        self.remainder: List[Member] = []
 
         # チームの数
-        self.team_num = 2
+        self.team_num: int = 2
         # 1チームの最大人数
-        self.team_size = 5
+        self.team_size: int = 5
 
     def add_member(self, name: str) -> None:
         """
@@ -53,7 +54,7 @@ class TeamMaker():
         """
         self.members.clear()
 
-    def make_team(self) -> None:
+    def make_team(self) -> Tuple[List[List[Member]], List[Member]]:
         """
         追加済みのメンバーからチームを作成する
         メンバーが少ない場合、メンバーは全てのチームに均等に振り分けられる
@@ -85,3 +86,5 @@ class TeamMaker():
             teams.append(team)
         
         self.teams = teams
+
+        return self.teams, self.remainder

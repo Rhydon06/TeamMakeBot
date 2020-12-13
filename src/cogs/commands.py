@@ -1,13 +1,14 @@
+from src.team_maker.team_maker import TeamMaker
 from discord.ext import commands
 from ..embed_builder import Embed_Builder
 
 class CommandsCog(commands.Cog):
-    """ｆ
+    """
     基本的なコマンド
     """
     def __init__(self, bot) -> None:
         self.bot = bot
-        self.tm = bot.tm
+        self.tm: TeamMaker = bot.tm
 
     @commands.command()
     async def add(self, ctx, *names: str) -> None:
@@ -37,6 +38,22 @@ class CommandsCog(commands.Cog):
         eb = Embed_Builder("追加")
         eb.add_values("追加したメンバー", added_members)
         await ctx.send(embed=eb.embed)
+    
+    @commands.command(name="join")
+    async def _join(self, ctx) -> None:
+        """
+        Botに送信者の名前を追加して、結果を表示する
+        """
+        
+        name = ctx.author.display_name
+
+        try:
+            self.tm.add_member(name)
+        except ValueError:
+            await ctx.send(f"{name} は既に追加されています")
+            return
+
+        await ctx.send(f"{name} を追加しました")
 
     @commands.command()
     async def delete(self, ctx, *names: str) -> None:
@@ -66,6 +83,22 @@ class CommandsCog(commands.Cog):
         eb = Embed_Builder("削除")
         eb.add_values("削除したメンバー", deleted_members)
         await ctx.send(embed=eb.embed)
+
+    @commands.command()
+    async def leave(self, ctx) -> None:
+        """
+        Botから送信者の名前を削除して、結果を表示する
+        """
+        
+        name = ctx.author.display_name
+
+        try:
+            self.tm.delete_member(name)
+        except ValueError:
+            await ctx.send(f"{name} は追加されていません")
+            return
+
+        await ctx.send(f"{name} を削除しました")
 
     @commands.command()
     async def clear(self, ctx) -> None:
@@ -231,9 +264,6 @@ class CommandsCog(commands.Cog):
 
         await ctx.send(f"1チームの人数を {size} に変更しました")
 
-    @commands.command()
-    async def hello(self, ctx) -> None:
-        await ctx.send("hello")
 
 # Bot本体側からコグを読み込む際に呼び出される関数
 def setup(bot):
