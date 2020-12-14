@@ -91,9 +91,41 @@ class TeamMaker():
 
         # 3.優先度の変更
         for member in self.remainder:
-            member.priority += 1
+            member.priority_change(1)
         for team in self.teams:
             for member in team:
-                member.priority = 0
+                member.priority_reset()
 
         return self.teams, self.remainder
+    
+
+    def fix(self, name) -> None:
+        """
+        指定した名前のメンバーを固定する
+        指定した名前が無い場合ValueErrorを発生させる
+        """
+        # 指定した名前のメンバーを固定
+        for member in self.__members:
+            if member.name == name:
+                member.fix()
+                return
+
+        else:
+            # 指定した名前が見つからなければValueErrorを発生させる
+            raise ValueError("指定した名前のメンバーは追加されていません。")
+    
+
+    def unfix(self, name) -> None:
+        """
+        指定した名前のメンバーの固定を解除する
+        指定した名前が無い場合ValueErrorを発生させる
+        """
+        # 指定した名前のメンバーの固定を解除
+        for member in self.__members:
+            if member.name == name:
+                member.unfix()
+                return
+
+        else:
+            # 指定した名前が見つからなければValueErrorを発生させる
+            raise ValueError("指定した名前のメンバーは追加されていません。")

@@ -18,7 +18,7 @@ class TeamMakeBot(commands.Bot):
     run(トークン)で起動する
     """
 
-    def __init__(self, command_prefix: str) -> None:
+    def __init__(self, command_prefix: str):
         print("bot起動中…")
         
         # discordに入力するコマンドの接頭語を設定
@@ -30,7 +30,6 @@ class TeamMakeBot(commands.Bot):
         # コグの読み込み
         for cog in COGS:
             self.load_extension(f"{COGS_FOLDER}.{cog}")
-
     
     async def on_ready(self) -> None:
         """
