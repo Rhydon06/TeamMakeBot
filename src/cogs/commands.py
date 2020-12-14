@@ -130,10 +130,12 @@ class Commands(commands.Cog):
         """
         チーム分けをする
         """
+        """
         # メンバーがチーム数より少ない場合その旨を出力して終了
         if len(self.tm.members) < self.tm.team_num:
             await ctx.send("メンバーが少なすぎます")
             return
+        """
         
         # チーム分け
         self.tm.make_team()
@@ -199,11 +201,6 @@ class Commands(commands.Cog):
         # ボイスチャンネルに接続中のメンバーの表示名
         names = [member.display_name for member in voice.channel.members]
 
-        # メンバーがチーム数より少ない場合その旨を出力して終了
-        if len(names) < self.tm.team_num:
-            await ctx.send("メンバーが少なすぎます")
-            return
-
         # メンバーを空にする
         self.tm.clear_member()
 
@@ -219,11 +216,9 @@ class Commands(commands.Cog):
 
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("チーム分け")
-        # チームに分けられたメンバー
         for i, team in enumerate(self.tm.teams):
             eb.add_values(f"チーム{i+1}", team)
-        # 余りのメンバー
-        if len(self.tm.remainder) > 0:
+        if self.tm.remainder:
             eb.add_values("余り", self.tm.remainder, inline=False)
         await ctx.send(embed=eb.embed)
 

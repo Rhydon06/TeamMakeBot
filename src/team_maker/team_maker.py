@@ -8,7 +8,7 @@ class TeamMaker():
     """
     def __init__(self) -> None:
         # チーム作成時に使うメンバー
-        self.members: List[Member] = []
+        self.__members: List[Member] = []
         
         # 完成済みチーム
         self.teams: List[List[Member]] = []
@@ -26,12 +26,12 @@ class TeamMaker():
         既に同じ名前のメンバーが追加されている場合ValueErrorを発生させる
         """
         # 登録する名前と同じ名前のメンバーが既に存在する場合、登録をしない
-        for member in self.members:
+        for member in self.__members:
             if member.name == name:
                 raise ValueError("同じ名前のメンバーが既に追加されています。")
 
         # メンバーを追加
-        self.members.append(Member(name))
+        self.__members.append(Member(name))
     
     def delete_member(self, name: str) -> None:
         """
@@ -39,9 +39,9 @@ class TeamMaker():
         指定した名前が無い場合ValueErrorを発生させる
         """
         # 指定した名前のメンバーを削除
-        for member in self.members:
+        for member in self.__members:
             if member.name == name:
-                self.members.remove(member)
+                self.__members.remove(member)
                 return
 
         else:
@@ -52,7 +52,7 @@ class TeamMaker():
         """
         全てのメンバーを削除
         """
-        self.members.clear()
+        self.__members.clear()
 
     def make_team(self) -> Tuple[List[List[Member]], List[Member]]:
         """
@@ -62,18 +62,20 @@ class TeamMaker():
         """
         # 1.チームに振り分けるメンバーと余りになるメンバーを決める
         # 2.各チームに振り分ける
-
+        # 3.優先度の変更
 
         # 1.チームに振り分けるメンバーと余りのメンバーを分ける
 
         # チームに入ることができる人数（チーム数*1チームの上限）
         limit = self.team_num*self.team_size
-        shuffled_members = random.sample(self.members, len(self.members))
+        shuffled_members = random.sample(self.__members, len(self.__members))
+        # 優先度順に並び変える　同じ優先度のメンバーの並びはランダムのまま
+        shuffled_members.sort(key=lambda member: member.priority, reverse=True)
 
         # この後チームに振り分けるメンバー
         team_member = shuffled_members[:limit]
         # 余り
-        self.remainder = shuffled_members[limit:]
+        self.remainder = sorted(shuffled_members[limit:], key=lambda member: member.name)
 
 
         # 2.チーム分けを行う
@@ -82,9 +84,16 @@ class TeamMaker():
         teams = []
         for i in range(self.team_num):
             team = team_member[i::self.team_num]
-            team = sorted(team, key=lambda x: x.name)
-            teams.append(team)
-        
+            team = sorted(team, key=lambda member: member.name)
+            if team:
+                teams.append(team)
         self.teams = teams
+
+        # 3.優先度の変更
+        for member in self.remainder:
+            member.priority += 1
+        for team in self.teams:
+            for member in team:
+                member.priority = 0
 
         return self.teams, self.remainder
