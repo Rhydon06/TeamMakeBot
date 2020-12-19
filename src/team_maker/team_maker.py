@@ -19,6 +19,10 @@ class TeamMaker():
         self.team_num: int = 2
         # 1チームの最大人数
         self.team_size: int = 5
+    
+    @property
+    def members(self):
+        return self.__members
 
     def add_member(self, name: str) -> None:
         """

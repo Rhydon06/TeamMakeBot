@@ -188,7 +188,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def makevc(self, ctx) -> None:
         """
-        Botのメンバーを全て削除し、送信者と同じボイスチャンネルに接続している人をBotに追加し、チーム分けをする
+        ボイスチャンネルに接続している人だけでチーム分けをする
         """
         # 送信者が接続しているボイスチャンネル
         voice = ctx.author.voice
@@ -197,12 +197,17 @@ class Commands(commands.Cog):
         if not voice:
             await ctx.send("ボイスチャンネルに入って実行してください")
             return
-        
+
         # ボイスチャンネルに接続中のメンバーの表示名
         names = [member.display_name for member in voice.channel.members]
 
-        # メンバーを空にする
-        self.tm.clear_member()
+        # vcにいないメンバーの削除
+        for member in self.tm.members:
+            if member.name not in names:
+                try:
+                    self.tm.delete_member(member.name)
+                except ValueError:
+                    pass
 
         # メンバーの追加
         for name in names:

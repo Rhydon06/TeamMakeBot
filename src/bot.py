@@ -8,6 +8,7 @@ COGS_FOLDER = "src.cogs"
 # コグ
 COGS = [
     "commands",
+    "user_settings",
     "settings",
     "hello"
 ]
