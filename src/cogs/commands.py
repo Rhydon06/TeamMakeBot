@@ -202,10 +202,11 @@ class Commands(commands.Cog):
         names = [member.display_name for member in voice.channel.members]
 
         # vcにいないメンバーの削除
-        for member in self.tm.members:
-            if member.name not in names:
+        tm_member_names = [member.name for member in self.tm.members]
+        for name in tm_member_names:
+            if name not in names:
                 try:
-                    self.tm.delete_member(member.name)
+                    self.tm.delete_member(name)
                 except ValueError:
                     pass
 
