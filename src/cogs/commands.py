@@ -9,6 +9,7 @@ class Commands(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.tm: TeamMaker = bot.tm
+        self.deleted_name = set()
 
     @commands.command()
     async def add(self, ctx, *names: str) -> None:
@@ -26,6 +27,7 @@ class Commands(commands.Cog):
             try:
                 self.tm.add_member(name)
                 added_members.append(name)
+                self.deleted_name.discard(name)
             except ValueError:
                 pass
         
@@ -49,6 +51,7 @@ class Commands(commands.Cog):
 
         try:
             self.tm.add_member(name)
+            self.deleted_name.discard(name)
         except ValueError:
             await ctx.send(f"{name} は既に追加されています")
             return
@@ -65,12 +68,13 @@ class Commands(commands.Cog):
             await ctx.send("名前が入力されていません")
             return
 
-        # メンバーの追加を試み、追加したメンバーとしていないメンバーに分ける
+        # メンバーの削除を試み、削除したメンバーとしていないメンバーに分ける
         deleted_members = []
         for name in names:
             try:
                 self.tm.delete_member(name)
                 deleted_members.append(name)
+                self.deleted_name.add(name)
             except ValueError:
                 pass
 
@@ -94,6 +98,7 @@ class Commands(commands.Cog):
 
         try:
             self.tm.delete_member(name)
+            self.deleted_name.add(name)
         except ValueError:
             await ctx.send(f"{name} は追加されていません")
             return
@@ -106,6 +111,7 @@ class Commands(commands.Cog):
         Botに追加されているメンバーを全て削除する
         """
         self.tm.clear_member()
+        self.deleted_name = set()
         await ctx.send("全てのメンバーを削除しました")
 
     @commands.command(name="list")
@@ -169,6 +175,8 @@ class Commands(commands.Cog):
         # メンバーの追加を試み、追加したメンバーとしていないメンバーに分ける
         added_members = []
         for name in names:
+            if name in self.deleted_name:
+                continue
             try:
                 self.tm.add_member(name)
                 added_members.append(name)
@@ -212,6 +220,8 @@ class Commands(commands.Cog):
 
         # メンバーの追加
         for name in names:
+            if name in self.deleted_name:
+                continue
             try:
                 self.tm.add_member(name)
             except ValueError:

@@ -4,8 +4,10 @@ class Member():
     """
     def __init__(self, name: str, fixed: bool=False) -> None:
         self.name: str = name
-        self.__fixed: bool = fixed
-        self.__priority: int = 1 if not fixed else 1000
+        self.__fixed: bool = False
+        self.__priority: int = 0
+        if fixed:
+            self.fix()
     
     @property
     def priority(self):
