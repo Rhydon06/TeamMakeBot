@@ -8,11 +8,11 @@ class Hello(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def hello(self, ctx) -> None:
+    async def hello(self, ctx: commands.Context) -> None:
         """
-        挨拶をしましょう
+        botが挨拶を返します。
         """
-        await ctx.send(f"hello {ctx.author.display_name}")
+        await ctx.send(f"hello! {ctx.author.display_name}")
 
 # Bot本体側からコグを読み込む際に呼び出される関数
 def setup(bot):

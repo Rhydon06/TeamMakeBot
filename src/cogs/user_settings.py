@@ -1,4 +1,5 @@
 from src.team_maker.team_maker import TeamMaker
+from discord import Member
 from discord.ext import commands
 from ..embed_builder import Embed_Builder
 
@@ -11,21 +12,21 @@ class UserSettings(commands.Cog):
         self.tm: TeamMaker = bot.tm
     
     @commands.command()
-    async def fix(self, ctx, *names: str) -> None:
+    async def fix(self, ctx: commands.Context, *members: Member) -> None:
         """
         指定したメンバーが余りにならないようにする
         """
         # 名前が入力されていない場合その旨を出力する
-        if len(names) == 0:
+        if len(members) == 0:
             await ctx.send("名前が入力されていません")
             return
 
         # メンバーの固定を試み、固定したメンバーとしていないメンバーに分ける
         fixed_members = []
-        for name in names:
+        for member in members:
             try:
-                self.tm.fix(name)
-                fixed_members.append(name)
+                self.tm.fix(member.id)
+                fixed_members.append(member.display_name)
             except ValueError:
                 pass
         
@@ -40,21 +41,21 @@ class UserSettings(commands.Cog):
         await ctx.send(embed=eb.embed)
     
     @commands.command()
-    async def unfix(self, ctx, *names: str) -> None:
+    async def unfix(self, ctx: commands.Context, *members: Member) -> None:
         """
         指定したメンバーの固定状態を解除する
         """
         # 名前が入力されていない場合その旨を出力する
-        if len(names) == 0:
+        if len(members) == 0:
             await ctx.send("名前が入力されていません")
             return
 
         # メンバーの固定の解除を試み、固定を解除したメンバーとしていないメンバーに分ける
         unfixed_members = []
-        for name in names:
+        for member in members:
             try:
-                self.tm.unfix(name)
-                unfixed_members.append(name)
+                self.tm.unfix(member.id)
+                unfixed_members.append(member.display_name)
             except ValueError:
                 pass
         

@@ -1,4 +1,6 @@
+from typing import List
 from src.team_maker.team_maker import TeamMaker
+from discord import Member, Guild
 from discord.ext import commands
 from ..embed_builder import Embed_Builder
 
@@ -9,25 +11,31 @@ class Commands(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.tm: TeamMaker = bot.tm
-        self.deleted_name = set()
+
+    def names_from_members(self, members, guild: Guild):
+        members = [guild.get_member(member.id) for member in members]
+        # names = list(map(lambda member: f"{member.display_name} {member.id}", members))
+        names = [member.display_name for member in members]
+        return names
 
     @commands.command()
-    async def add(self, ctx, *names: str) -> None:
+    async def add(self, ctx: commands.Context, *members: Member) -> None:
         """
         Botにメンバーを追加する
         """
-        # 名前が入力されていない場合その旨を出力する
-        if len(names) == 0:
-            await ctx.send("名前が入力されていません")
-            return
+
+        # 名前が入力されていない場合自分を追加する
+        if len(members) == 0:
+            members = [ctx.author]
 
         # メンバーの追加を試み、追加したメンバーとしていないメンバーに分ける
         added_members = []
-        for name in names:
+        for member in members:
             try:
-                self.tm.add_member(name)
-                added_members.append(name)
-                self.deleted_name.discard(name)
+                self.tm.members_deleted.discard(member.id)
+                self.tm.members_not_deleted.add(member.id)
+                self.tm.add_member(member.id)
+                added_members.append(member.display_name)
             except ValueError:
                 pass
         
@@ -40,41 +48,24 @@ class Commands(commands.Cog):
         eb = Embed_Builder("追加")
         eb.add_values("追加したメンバー", added_members)
         await ctx.send(embed=eb.embed)
-    
-    @commands.command(name="join")
-    async def _join(self, ctx) -> None:
-        """
-        Botに送信者を追加する
-        """
-        
-        name = ctx.author.display_name
-
-        try:
-            self.tm.add_member(name)
-            self.deleted_name.discard(name)
-        except ValueError:
-            await ctx.send(f"{name} は既に追加されています")
-            return
-
-        await ctx.send(f"{name} を追加しました")
 
     @commands.command()
-    async def delete(self, ctx, *names: str) -> None:
+    async def delete(self, ctx: commands.Context, *members: Member) -> None:
         """
         Botから指定したメンバーを削除する
         """
-        # 名前が入力されていない場合その旨を出力して終了
-        if len(names) == 0:
-            await ctx.send("名前が入力されていません")
-            return
+        # 名前が入力されていない場合自分を削除する
+        if len(members) == 0:
+            members = [ctx.author]
 
         # メンバーの削除を試み、削除したメンバーとしていないメンバーに分ける
         deleted_members = []
-        for name in names:
+        for member in members:
             try:
-                self.tm.delete_member(name)
-                deleted_members.append(name)
-                self.deleted_name.add(name)
+                self.tm.members_deleted.add(member.id)
+                self.tm.members_not_deleted.discard(member.id)
+                self.tm.delete_member(member.id)
+                deleted_members.append(member.display_name)
             except ValueError:
                 pass
 
@@ -89,59 +80,43 @@ class Commands(commands.Cog):
         await ctx.send(embed=eb.embed)
 
     @commands.command()
-    async def leave(self, ctx) -> None:
-        """
-        Botから送信者を削除する
-        """
-        
-        name = ctx.author.display_name
-
-        try:
-            self.tm.delete_member(name)
-            self.deleted_name.add(name)
-        except ValueError:
-            await ctx.send(f"{name} は追加されていません")
-            return
-
-        await ctx.send(f"{name} を削除しました")
-
-    @commands.command()
-    async def clear(self, ctx) -> None:
+    async def clear(self, ctx: commands.Context) -> None:
         """
         Botに追加されているメンバーを全て削除する
         """
         self.tm.clear_member()
-        self.deleted_name = set()
+        self.tm.members_deleted = set()
+        self.tm.members_not_deleted = set()
         await ctx.send("全てのメンバーを削除しました")
 
     @commands.command(name="list")
-    async def _list(self, ctx) -> None:
+    async def _list(self, ctx: commands.Context) -> None:
         """
         Botに追加済みのメンバーを表示する
         """
-        members = self.tm.members
-        
+
+        # TODO
+        names = self.names_from_members(self.tm.members, ctx.guild)
+
         # メンバーが登録されていない場合その旨を出力して終了
-        if len(members) == 0:
+        if len(names) == 0:
             await ctx.send("メンバーが登録されていません")
             return
         
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("表示")
-        eb.add_values("追加済みのメンバー", members)
+        eb.add_values("追加済みのメンバー", names)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
-    async def make(self, ctx) -> None:
+    async def make(self, ctx: commands.Context) -> None:
         """
         チーム分けをする
-        """
         """
         # メンバーがチーム数より少ない場合その旨を出力して終了
         if len(self.tm.members) < self.tm.team_num:
             await ctx.send("メンバーが少なすぎます")
             return
-        """
         
         # チーム分け
         self.tm.make_team()
@@ -150,14 +125,16 @@ class Commands(commands.Cog):
         eb = Embed_Builder("チーム分け")
         # チームに分けられたメンバー
         for i, team in enumerate(self.tm.teams):
-            eb.add_values(f"チーム{i+1}", team)
+            names = self.names_from_members(team, ctx.guild)
+            eb.add_values(f"チーム{i+1}", names)
         # 余りのメンバー
-        if len(self.tm.remainder) > 0:
-            eb.add_values("余り", self.tm.remainder, inline=False)
+        if self.tm.remainder:
+            names = self.names_from_members(self.tm.remainder, ctx.guild)
+            eb.add_values("余り", names, inline=False)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
-    async def addvc(self, ctx) -> None:
+    async def addvc(self, ctx: commands.Context) -> None:
         """
         送信者と同じボイスチャンネルに接続している人をBotに追加する
         """
@@ -170,16 +147,14 @@ class Commands(commands.Cog):
             return
 
         # ボイスチャンネルに接続中のメンバーの表示名
-        names = [member.display_name for member in voice.channel.members]
+        members: List[Member] = voice.channel.members
 
         # メンバーの追加を試み、追加したメンバーとしていないメンバーに分ける
         added_members = []
-        for name in names:
-            if name in self.deleted_name:
-                continue
+        for member in members:
             try:
-                self.tm.add_member(name)
-                added_members.append(name)
+                self.tm.add_member(member.id)
+                added_members.append(member.display_name)
             except ValueError:
                 pass
         
@@ -194,7 +169,7 @@ class Commands(commands.Cog):
         await ctx.send(embed=eb.embed)
 
     @commands.command()
-    async def makevc(self, ctx) -> None:
+    async def makevc(self, ctx: commands.Context) -> None:
         """
         ボイスチャンネルに接続している人だけでチーム分けをする
         """
@@ -207,23 +182,20 @@ class Commands(commands.Cog):
             return
 
         # ボイスチャンネルに接続中のメンバーの表示名
-        names = [member.display_name for member in voice.channel.members]
+        members: List[Member] = voice.channel.members
+        ids = set([member.id for member in members])
 
-        # vcにいないメンバーの削除
-        tm_member_names = [member.name for member in self.tm.members]
-        for name in tm_member_names:
-            if name not in names:
+        for member in self.tm.members:
+            if member.id not in ids:
                 try:
-                    self.tm.delete_member(name)
+                    self.tm.delete_member(member.id)
                 except ValueError:
                     pass
 
         # メンバーの追加
-        for name in names:
-            if name in self.deleted_name:
-                continue
+        for member in members:
             try:
-                self.tm.add_member(name)
+                self.tm.add_member(member.id)
             except ValueError:
                 pass
         
@@ -233,9 +205,11 @@ class Commands(commands.Cog):
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("チーム分け")
         for i, team in enumerate(self.tm.teams):
-            eb.add_values(f"チーム{i+1}", team)
+            names = self.names_from_members(team, ctx.guild)
+            eb.add_values(f"チーム{i+1}", names)
         if self.tm.remainder:
-            eb.add_values("余り", self.tm.remainder, inline=False)
+            names = self.names_from_members(self.tm.remainder, ctx.guild)
+            eb.add_values("余り", names, inline=False)
         await ctx.send(embed=eb.embed)
 
 

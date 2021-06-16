@@ -10,7 +10,7 @@ class Settings(commands.Cog):
         self.tm: TeamMaker = bot.tm
 
     @commands.command()
-    async def tnum(self, ctx, num: str) -> None:
+    async def tnum(self, ctx: commands.Context, num: str) -> None:
         """
         チーム数を変更する
         """
@@ -28,7 +28,7 @@ class Settings(commands.Cog):
         await ctx.send(f"チーム数を {num} に変更しました")
     
     @commands.command()
-    async def tsize(self, ctx, size: str) -> None:
+    async def tsize(self, ctx: commands.Context, size: str) -> None:
         """
         1チームの人数を変更する
         """
