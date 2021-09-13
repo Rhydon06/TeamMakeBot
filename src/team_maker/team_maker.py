@@ -90,7 +90,7 @@ class TeamMaker():
         # この後チームに振り分けるメンバー
         team_member = random.sample(shuffled_members[:limit], min(limit, len(shuffled_members)))
         # 余り
-        self.remainder = sorted(shuffled_members[limit:])
+        self.remainder = sorted(shuffled_members[limit:], key=lambda member: (member.fixed, member.priority), reverse=True)
 
 
         # 2.チーム分けを行う
