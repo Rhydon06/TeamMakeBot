@@ -4,6 +4,9 @@ from discord import Member, Guild
 from discord.ext import commands
 from ..embed_builder import Embed_Builder
 
+# TODO
+MAX_VALUE_LEN = 12
+
 class Commands(commands.Cog):
     """
     基本的なコマンド
@@ -46,7 +49,7 @@ class Commands(commands.Cog):
 
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("追加")
-        eb.add_values("追加したメンバー", added_members)
+        eb.add_values("追加したメンバー", added_members, MAX_VALUE_LEN)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
@@ -76,7 +79,7 @@ class Commands(commands.Cog):
 
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("削除")
-        eb.add_values("削除したメンバー", deleted_members)
+        eb.add_values("削除したメンバー", deleted_members, MAX_VALUE_LEN)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
@@ -105,7 +108,7 @@ class Commands(commands.Cog):
         
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("表示")
-        eb.add_values("追加済みのメンバー", names)
+        eb.add_values("追加済みのメンバー", names, MAX_VALUE_LEN)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
@@ -126,11 +129,11 @@ class Commands(commands.Cog):
         # チームに分けられたメンバー
         for i, team in enumerate(self.tm.teams):
             names = self.names_from_members(team, ctx.guild)
-            eb.add_values(f"チーム{i+1}", names)
+            eb.add_values(f"チーム{i+1}", names, MAX_VALUE_LEN)
         # 余りのメンバー
         if self.tm.remainder:
             names = self.names_from_members(self.tm.remainder, ctx.guild)
-            eb.add_values("余り", names, inline=False)
+            eb.add_values("余り", names, MAX_VALUE_LEN, inline=False)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
@@ -165,7 +168,7 @@ class Commands(commands.Cog):
 
         # Discordに表示される埋め込みオブジェクトの作成と送信
         eb = Embed_Builder("追加")
-        eb.add_values("追加したメンバー", added_members)
+        eb.add_values("追加したメンバー", added_members, MAX_VALUE_LEN)
         await ctx.send(embed=eb.embed)
 
     @commands.command()
@@ -206,10 +209,10 @@ class Commands(commands.Cog):
         eb = Embed_Builder("チーム分け")
         for i, team in enumerate(self.tm.teams):
             names = self.names_from_members(team, ctx.guild)
-            eb.add_values(f"チーム{i+1}", names)
+            eb.add_values(f"チーム{i+1}", names, MAX_VALUE_LEN)
         if self.tm.remainder:
             names = self.names_from_members(self.tm.remainder, ctx.guild)
-            eb.add_values("余り", names, inline=False)
+            eb.add_values("余り", names, MAX_VALUE_LEN, inline=False)
         await ctx.send(embed=eb.embed)
 
 
