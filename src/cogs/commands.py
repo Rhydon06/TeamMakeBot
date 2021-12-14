@@ -193,7 +193,7 @@ class Commands(commands.Cog):
         for member in self.tm.members:
             if member.id in ids:
                 new_members.append(member)
-        self.tm.members = new_members
+        self.tm.change_members(new_members)
 
         # メンバーの追加
         for member in members:

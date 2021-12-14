@@ -29,6 +29,9 @@ class TeamMaker():
     def members(self):
         return self.__members
 
+    def change_members(self, members):
+        self.__members = members
+
     def add_member(self, id: int) -> None:
         """
         チームメーカーにメンバーを追加する
