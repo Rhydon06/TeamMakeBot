@@ -188,12 +188,12 @@ class Commands(commands.Cog):
         members: List[Member] = voice.channel.members
         ids = set([member.id for member in members])
 
+        new_members: List[Member] = []
+
         for member in self.tm.members:
-            if member.id not in ids:
-                try:
-                    self.tm.delete_member(member.id)
-                except ValueError:
-                    pass
+            if member.id in ids:
+                new_members.append(member)
+        self.tm.members = new_members
 
         # メンバーの追加
         for member in members:
